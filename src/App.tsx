@@ -1,33 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-
 import heroMachine from "@/assets/hero-machine.jpg";
 import modelBasic from "@/assets/model-basic.jpg";
 import modelCooling from "@/assets/model-cooling.jpg";
 import founderImg from "@/assets/founder.jpg";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "InnoVend — Farmer-Built Milk Vending Machine, Namakkal" },
-      {
-        name: "description",
-        content:
-          "Fresh cow milk from Rs 5, dispensed into your own container. A 40-litre milk vending machine built by C. Balamurugan in Namakkal, Tamil Nadu.",
-      },
-      {
-        property: "og:title",
-        content: "InnoVend — Farmer-Built Milk Vending Machine, Namakkal",
-
-      },
-      {
-        property: "og:description",
-        content:
-          "Fresh cow milk from Rs 5, dispensed into your own container. Basic and cooling models built in Namakkal, Tamil Nadu.",
-      },
-    ],
-  }),
-  component: Index,
-});
 
 const NAV = [
   { href: "#how", label: "How it works" },
@@ -86,7 +61,7 @@ function LogoMark() {
   );
 }
 
-function Index() {
+export default function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground leading-normal selection:bg-ochre/30">
       <header className="bg-azure text-cream sticky top-0 z-50">
