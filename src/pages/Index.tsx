@@ -1,3 +1,4 @@
+import { useState } from "react";
 import heroMachine from "@/assets/hero-machine.jpg";
 import modelBasic from "@/assets/model-basic.jpg";
 import modelCooling from "@/assets/model-cooling.jpg";
@@ -61,6 +62,69 @@ function LogoMark() {
 }
 
 export default function Index() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    category: "Farm / dairy producer",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string }>({
+    type: null,
+    message: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus({ type: null, message: "" });
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "21b38033-6716-49aa-8613-c697d666e2da",
+          subject: "New InnoVend Machine Enquiry",
+          from_name: "InnoVend Website",
+          name: formData.name,
+          phone: formData.phone,
+          category: formData.category,
+          message: formData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus({
+          type: "success",
+          message: "Thank you! Your enquiry has been received. The founder will reply shortly.",
+        });
+        setFormData({
+          name: "",
+          phone: "",
+          category: "Farm / dairy producer",
+          message: "",
+        });
+      } else {
+        setStatus({
+          type: "error",
+          message: data.message || "Something went wrong. Please try again.",
+        });
+      }
+    } catch {
+      setStatus({
+        type: "error",
+        message: "Network error. Please check your connection and try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-background text-foreground leading-normal selection:bg-ochre/30">
       <header className="bg-azure text-cream sticky top-0 z-50">
@@ -496,8 +560,19 @@ export default function Index() {
             </div>
             <form
               className="bg-milk text-foreground rounded-2xl p-7 ring-1 ring-black/5 grid gap-4"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit}
             >
+              {status.type === "success" && (
+                <div className="p-3.5 rounded-lg bg-emerald-100 text-emerald-900 text-sm font-medium border border-emerald-300">
+                  {status.message}
+                </div>
+              )}
+              {status.type === "error" && (
+                <div className="p-3.5 rounded-lg bg-rose-100 text-rose-900 text-sm font-medium border border-rose-300">
+                  {status.message}
+                </div>
+              )}
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <label className="block">
                   <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -505,6 +580,10 @@ export default function Index() {
                   </span>
                   <input
                     type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="mt-1.5 w-full rounded-lg bg-cream/60 ring-1 ring-black/10 px-3.5 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-azure"
                     placeholder="Your name"
                   />
@@ -515,6 +594,10 @@ export default function Index() {
                   </span>
                   <input
                     type="tel"
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="mt-1.5 w-full rounded-lg bg-cream/60 ring-1 ring-black/10 px-3.5 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-azure"
                     placeholder="Mobile number"
                   />
@@ -524,7 +607,12 @@ export default function Index() {
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   I am a
                 </span>
-                <select className="mt-1.5 w-full rounded-lg bg-cream/60 ring-1 ring-black/10 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-azure">
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="mt-1.5 w-full rounded-lg bg-cream/60 ring-1 ring-black/10 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-azure"
+                >
                   <option>Farm / dairy producer</option>
                   <option>Trader / retailer</option>
                   <option>Village cooperative</option>
@@ -536,15 +624,20 @@ export default function Index() {
                 </span>
                 <textarea
                   rows={3}
+                  name="message"
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="mt-1.5 w-full rounded-lg bg-cream/60 ring-1 ring-black/10 px-3.5 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-azure"
                   placeholder="Tell us about your herd, location or demand…"
                 />
               </label>
               <button
                 type="submit"
-                className="mt-1 inline-flex items-center justify-center rounded-lg bg-ochre text-stone-900 px-5 py-3 text-sm font-semibold ring-1 ring-black/10"
+                disabled={isSubmitting}
+                className="mt-1 inline-flex items-center justify-center rounded-lg bg-ochre text-stone-900 px-5 py-3 text-sm font-semibold ring-1 ring-black/10 hover:opacity-90 disabled:opacity-50 transition-opacity cursor-pointer disabled:cursor-not-allowed"
               >
-                Send enquiry
+                {isSubmitting ? "Sending enquiry..." : "Send enquiry"}
               </button>
             </form>
           </div>
