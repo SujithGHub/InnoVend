@@ -87,9 +87,9 @@ export default function Index() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: "21b38033-6716-49aa-8613-c697d666e2da",
+          access_key: "bec6fb23-0715-4c22-81b3-7e2ea9588d1f",
           subject: "New InnoVend Machine Enquiry",
-          from_name: "InnoVend Website",
+          from_name: "InnoVend",
           name: formData.name,
           phone: formData.phone,
           category: formData.category,
